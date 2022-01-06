@@ -20,6 +20,11 @@ app = Flask(__name__)
 api = Api(app)
 schema = SearchQuerySchema()
 
+
+# do the actual search
+def do_search(searchObject: SearchQuerySchema):
+    return "you searched for "+searchObject.query
+
 # define the api, validate, return results
 class SearchAPI(Resource):
     def get(self):
@@ -29,15 +34,11 @@ class SearchAPI(Resource):
         searchObject = schema.load(request.args)
         return do_search(searchObject)
 
-@app.route("/")
+@app.route('/')
 def index():
-    return "<h1 style='color:green'>Welcome to the Mvskoke Language API!</h1>"
+    return '<p>Welcome to the Mvskoke Language Api.  To search, try the endpoint /search?query=[myquery]</p>'
 
 api.add_resource(SearchAPI, '/search', endpoint = 'search')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
-
-# do the actual search
-def do_search(searchObject: SearchQuerySchema):
-    return "you searched for "+searchObject.query
