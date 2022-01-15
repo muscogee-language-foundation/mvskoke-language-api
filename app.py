@@ -1,11 +1,7 @@
 from flask import Flask, request, abort
 from flask_restful import Resource, Api
 from marshmallow import Schema, fields, post_load
-
-# basic Search class
-class SearchQuery:
-    def __init__(self, query):
-        self.query = query
+from search import search, SearchQuery
 
 # arguments for the search query
 class SearchQuerySchema(Schema):
@@ -13,17 +9,12 @@ class SearchQuerySchema(Schema):
 
     # deserializing the object
     @post_load
-    def make_user(self, data, **kwargs):
+    def make_object(self, data, **kwargs):
         return SearchQuery(**data)
 
 app = Flask(__name__)
 api = Api(app)
 schema = SearchQuerySchema()
-
-
-# do the actual search
-def do_search(searchObject: SearchQuerySchema):
-    return "you searched for "+searchObject.query
 
 # define the api, validate, return results
 class SearchAPI(Resource):
@@ -32,7 +23,7 @@ class SearchAPI(Resource):
         if errors:
             abort(400, str(errors))
         searchObject = schema.load(request.args)
-        return do_search(searchObject)
+        return search(searchObject)
 
 @app.route('/')
 def index():
